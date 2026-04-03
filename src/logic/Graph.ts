@@ -1,69 +1,71 @@
 /**
  * Classe Graph - Representação por Lista de Adjacência
  * Implementada para o projeto Graph-Fit (Otimizador de Treinos)
+ * 
+ * ARQUITETURA: Para evitar erros de referência de memória em JavaScript (Map key equality),
+ * esta classe utiliza apenas Strings (IDs) para representar os vértices.
  */
-export class Graph<T> {
-  // O Map armazena o vértice como chave e um Set de adjacências como valor
-  // O Set garante que não haja arestas duplicadas
-  private adjacencyList: Map<T, Set<T>>;
+export class Graph {
+  // O Map armazena o ID do vértice como chave e um Set de IDs adjacentes como valor
+  private adjacencyList: Map<string, Set<string>>;
 
   constructor() {
     this.adjacencyList = new Map();
   }
 
   /**
-   * Adiciona um novo vértice (exercício) ao grafo
+   * Adiciona um novo vértice (ID do exercício) ao grafo
    */
-  addVertex(v: T): void {
-    if (!this.adjacencyList.has(v)) {
-      this.adjacencyList.set(v, new Set());
+  addVertex(id: string): void {
+    if (!this.adjacencyList.has(id)) {
+      this.adjacencyList.set(id, new Set());
     }
   }
 
   /**
-   * Adiciona uma aresta (relação de músculo comum) entre v e w
+   * Adiciona uma aresta (relação de músculo comum) entre dois exercícios pelos seus IDs
    * Como o treino é mútuo, o grafo é não-dirigido
    */
-  addEdge(v: T, w: T): void {
+  addEdge(vId: string, wId: string): void {
     // Garante que ambos os vértices existem
-    if (!this.adjacencyList.has(v)) this.addVertex(v);
-    if (!this.adjacencyList.has(w)) this.addVertex(w);
+    if (!this.adjacencyList.has(vId)) this.addVertex(vId);
+    if (!this.adjacencyList.has(wId)) this.addVertex(wId);
 
     // Adiciona a relação bidirecional
-    this.adjacencyList.get(v)?.add(w);
-    this.adjacencyList.get(w)?.add(v);
+    this.adjacencyList.get(vId)?.add(wId);
+    this.adjacencyList.get(wId)?.add(vId);
   }
 
   /**
-   * Retorna a lista de adjacência de um vértice específico
+   * Retorna a lista de IDs adjacentes de um vértice específico
    */
-  getAdjacents(v: T): T[] {
-    return Array.from(this.adjacencyList.get(v) || []);
+  getAdjacents(id: string): string[] {
+    return Array.from(this.adjacencyList.get(id) || []);
   }
 
   /**
-   * Retorna todos os vértices do grafo
+   * Retorna todos os IDs dos vértices do grafo
    */
-  getVertices(): T[] {
+  getVertices(): string[] {
     return Array.from(this.adjacencyList.keys());
   }
 
   /**
    * Retorna o grau de um vértice (número de conexões)
-   * Essencial para o algoritmo de Welsh-Powell
+   * Essencial para o algoritmo de Welsh-Powell (Coloração)
    */
-  getDegree(v: T): number {
-    return this.adjacencyList.get(v)?.size || 0;
+  getDegree(id: string): number {
+    return this.adjacencyList.get(id)?.size || 0;
   }
 
   /**
    * Imprime a representação do grafo no console (para debug)
    */
   printGraph(): void {
-    console.log("--- Representação do Grafo (Lista de Adjacência) ---");
-    for (const [vertex, edges] of this.adjacencyList) {
+    console.log("--- Representação do Grafo (IDs de Exercícios) ---");
+    for (const [id, edges] of this.adjacencyList) {
       const edgesStr = Array.from(edges).join(", ");
-      console.log(`${vertex} -> [${edgesStr}]`);
+      console.log(`${id} -> [${edgesStr}]`);
     }
   }
 }
