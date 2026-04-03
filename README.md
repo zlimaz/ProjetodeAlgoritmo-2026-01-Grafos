@@ -1,73 +1,30 @@
-# React + TypeScript + Vite
+# Graph-Fit (Otimizador de Treinos) 🏋️‍♂️📊
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Projeto de Algoritmo - Universidade de Brasília (UnB)**  
+*Módulo: Teoria dos Grafos (2026/01)*
 
-Currently, two official plugins are available:
+## 🎯 O Problema
+Dividir uma ficha de exercícios semanal de forma eficiente, garantindo que músculos recrutados em um dia tenham o descanso necessário antes de serem exigidos novamente.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🧠 A Solução (Teoria dos Grafos)
+O sistema modela a seleção de exercícios do usuário como um **Grafo Não-Dirigido**:
+- **Vértices (V):** Cada exercício escolhido pelo usuário.
+- **Arestas (E):** Uma conexão entre o Exercício A e o Exercício B existe se eles compartilharem o mesmo grupo muscular (primário ou secundário).
 
-## React Compiler
+### Algoritmo de Coloração (Welsh-Powell)
+Para gerar a divisão de treinos (Treino A, B, C...), utilizamos uma heurística de coloração baseada no algoritmo de **Welsh-Powell**:
+1. **Ordenação:** Os exercícios são ordenados pelo **grau** (número de conexões/músculos recrutados) em ordem decrescente.
+2. **Coloração Gulosa:** Atribuímos "cores" (dias de treino) aos vértices de forma que vértices adjacentes (que compartilham músculos) nunca tenham a mesma cor.
+3. **Resultado:** Cada cor gerada representa um dia de treino (Ex: Cor 0 = Treino A, Cor 1 = Treino B...), garantindo que o volume muscular seja distribuído sem sobreposição no mesmo dia.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tecnologias
+- **React + TypeScript**
+- **Vite**
+- **Estrutura de Dados:** Lista de Adjacência (Map/Set) para eficiência em grafos esparsos.
 
-## Expanding the ESLint configuration
+## 🚀 Como Executar
+1. Instale as dependências: `npm install`
+2. Inicie o ambiente de desenvolvimento: `npm run dev`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+*Desenvolvido por Miguel e Dupla para a disciplina de Projeto de Algoritmo - UnB.*
