@@ -68,4 +68,47 @@ export class Graph {
       console.log(`${id} -> [${edgesStr}]`);
     }
   }
+
+  /**
+   * Coloração de Vértices usando o algoritmo de Welsh-Powell
+   * Retorna um objeto onde a chave é a "cor" (dia de treino) e o valor é um array de IDs de exercícios
+   */
+  colorGraph(): Record<number, string[]> {
+    // 1. Ordena os vértices em ordem decrescente de grau
+    const vertices = this.getVertices().sort((a, b) => this.getDegree(b) - this.getDegree(a));
+    
+    const result: Record<number, string[]> = {};
+    const colored = new Set<string>();
+    let colorIndex = 0;
+
+    // 2. Itera sobre todos os vértices
+    for (const v of vertices) {
+      if (colored.has(v)) continue; // Pula se já estiver colorido
+
+      // Atribui uma nova cor a este vértice
+      result[colorIndex] = [v];
+      colored.add(v);
+
+      // 3. Tenta atribuir a mesma cor aos vértices restantes
+      for (const w of vertices) {
+        if (!colored.has(w)) {
+          // Verifica se w é adjacente a algum vértice já colorido com a cor atual
+          const isAdjacent = result[colorIndex].some((coloredVertex) => {
+            const adjacents = this.getAdjacents(w);
+            return adjacents.includes(coloredVertex);
+          });
+
+          // Se não for adjacente a nenhum vértice desta cor, pinta com a mesma cor
+          if (!isAdjacent) {
+            result[colorIndex].push(w);
+            colored.add(w);
+          }
+        }
+      }
+      
+      colorIndex++; // Prepara a próxima cor
+    }
+
+    return result;
+  }
 }
