@@ -38,11 +38,10 @@ function App() {
     <div className="app-shell">
       <header className="app-header">
         <div>
-          <span className="app-badge">Integração Finalizada</span>
-          <h1>Organizador de Treinos A/B/C</h1>
+          <h1>Graph-Fit</h1>
           <p className="app-lead">
-            Selecione os exercícios que deseja realizar na semana. O algoritmo de 
-            <strong> Coloração de Grafos (Welsh-Powell)</strong> agrupará os exercícios evitando conflitos musculares no mesmo dia.
+            Otimize sua rotina de musculação com inteligência. Selecione seus exercícios e nosso motor baseado em 
+            <strong> Teoria dos Grafos (Welsh-Powell)</strong> montará treinos perfeitos, garantindo o máximo rendimento e descanso muscular adequado para hipertrofia.
           </p>
         </div>
         <button className="action-button" onClick={handleGenerateWorkout}>

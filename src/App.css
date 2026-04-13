@@ -310,7 +310,7 @@
 .training-badge {
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(170, 59, 255, 0.12);
+  background: var(--accent-bg);
   color: var(--accent);
   font-weight: 700;
 }
@@ -326,9 +326,10 @@
 .training-card li {
   padding: 10px 14px;
   border-radius: 14px;
-  background: white;
+  background: var(--bg);
   color: var(--text-h);
   font-weight: 600;
+  border: 1px solid var(--border);
 }
 
 @media (max-width: 1024px) {
