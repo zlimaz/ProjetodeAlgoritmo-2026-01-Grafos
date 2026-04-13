@@ -1,43 +1,12 @@
 import { useState } from 'react'
 import './App.css'
-
-type Exercise = {
-  id: string
-  name: string
-  primaryMuscles: string[]
-  secondaryMuscles: string[]
-}
-
-const exerciseOptions: Exercise[] = [
-  { id: 'E1', name: 'Supino reto', primaryMuscles: ['peitoral'], secondaryMuscles: ['tríceps'] },
-  { id: 'E2', name: 'Barra fixa pronada', primaryMuscles: ['costas'], secondaryMuscles: ['bíceps'] },
-  { id: 'E3', name: 'Agachamento livre', primaryMuscles: ['quadríceps'], secondaryMuscles: ['glúteo'] },
-  { id: 'E4', name: 'Levantamento terra', primaryMuscles: ['posterior de coxa'], secondaryMuscles: ['lombar'] },
-  { id: 'E5', name: 'Desenvolvimento militar', primaryMuscles: ['deltoide'], secondaryMuscles: ['tríceps'] },
-  { id: 'E6', name: 'Rosca direta', primaryMuscles: ['bíceps'], secondaryMuscles: ['antebraço'] },
-  { id: 'E7', name: 'Tríceps testa', primaryMuscles: ['tríceps'], secondaryMuscles: ['antebraço'] },
-]
-
-const fakeWorkoutCards = [
-  {
-    id: 'A',
-    label: 'Treino A',
-    exercises: ['Supino reto', 'Fly inclinado', 'Tríceps testa'],
-  },
-  {
-    id: 'B',
-    label: 'Treino B',
-    exercises: ['Barra fixa pronada', 'Remada curvada', 'Rosca direta'],
-  },
-  {
-    id: 'C',
-    label: 'Treino C',
-    exercises: ['Agachamento livre', 'Leg press', 'Panturrilha em pé'],
-  },
-]
+import { exerciseDatabase, buildWorkoutGraph, getExerciseById } from './database'
 
 function App() {
-  const [selectedExercises, setSelectedExercises] = useState<string[]>(['E1', 'E2'])
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([
+    'E1', 'E2', 'E3', 'E4' // Alguns exercícios pré-selecionados
+  ])
+  const [workoutPlan, setWorkoutPlan] = useState<Record<number, string[]> | null>(null)
 
   const toggleExercise = (id: string) => {
     setSelectedExercises((current) =>
@@ -45,28 +14,51 @@ function App() {
     )
   }
 
+  const handleGenerateWorkout = () => {
+    if (selectedExercises.length === 0) {
+      setWorkoutPlan(null)
+      return
+    }
+
+    // Filtra os exercícios completos a partir dos IDs selecionados
+    const selectedList = exerciseDatabase.filter(e => selectedExercises.includes(e.id))
+    
+    // Constrói o grafo e gera a coloração
+    const graph = buildWorkoutGraph(selectedList)
+    const result = graph.colorGraph()
+    
+    setWorkoutPlan(result)
+  }
+
+  const getLabelForColor = (index: number) => {
+    return `Treino ${String.fromCharCode(65 + index)}`
+  }
+
   return (
     <div className="app-shell">
       <header className="app-header">
         <div>
-          <span className="app-badge">UI: Seleção de Exercícios</span>
+          <span className="app-badge">Integração Finalizada</span>
           <h1>Organizador de Treinos A/B/C</h1>
           <p className="app-lead">
-            Interface estática para selecionar exercícios e visualizar os cards de treino.
+            Selecione os exercícios que deseja realizar na semana. O algoritmo de 
+            <strong> Coloração de Grafos (Welsh-Powell)</strong> agrupará os exercícios evitando conflitos musculares no mesmo dia.
           </p>
         </div>
-        <button className="action-button">Gerar treino</button>
+        <button className="action-button" onClick={handleGenerateWorkout}>
+          Gerar treino otimizado
+        </button>
       </header>
 
       <main className="app-grid">
         <section className="panel panel-left">
           <div className="panel-header">
             <h2>Exercícios disponíveis</h2>
-            <p>Escolha alguns exercícios para simular a seleção do usuário.</p>
+            <p>Escolha os exercícios para montar sua rotina.</p>
           </div>
 
           <div className="exercise-list">
-            {exerciseOptions.map((exercise) => (
+            {exerciseDatabase.map((exercise) => (
               <label key={exercise.id} className="exercise-item">
                 <input
                   type="checkbox"
@@ -75,7 +67,10 @@ function App() {
                 />
                 <div>
                   <strong>{exercise.name}</strong>
-                  <p>{exercise.primaryMuscles.join(', ')} {exercise.secondaryMuscles.length > 0 ? `· ${exercise.secondaryMuscles.join(', ')}` : ''}</p>
+                  <p>
+                    {exercise.primaryMuscles.join(', ')} 
+                    {exercise.secondaryMuscles.length > 0 ? ` · ${exercise.secondaryMuscles.join(', ')}` : ''}
+                  </p>
                 </div>
               </label>
             ))}
@@ -84,24 +79,35 @@ function App() {
 
         <section className="panel panel-right">
           <div className="panel-header">
-            <h2>Cards de treino</h2>
-            <p>Layout de Treino A, B e C com conteúdo estático para protótipo.</p>
+            <h2>Seu Plano de Treino</h2>
+            <p>
+              {workoutPlan 
+                ? 'Treinos gerados pelo algoritmo Welsh-Powell.' 
+                : 'Clique no botão acima para processar o grafo.'}
+            </p>
           </div>
 
           <div className="cards-grid">
-            {fakeWorkoutCards.map((card) => (
-              <article key={card.id} className="training-card">
-                <div className="training-card__header">
-                  <span className="training-badge">{card.label}</span>
-                  <strong>{card.exercises.length} exercícios</strong>
-                </div>
-                <ul>
-                  {card.exercises.map((exercise) => (
-                    <li key={exercise}>{exercise}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+            {workoutPlan ? (
+              Object.entries(workoutPlan).map(([color, exerciseIds]) => (
+                <article key={color} className="training-card">
+                  <div className="training-card__header">
+                    <span className="training-badge">{getLabelForColor(Number(color))}</span>
+                    <strong>{exerciseIds.length} exercícios</strong>
+                  </div>
+                  <ul>
+                    {exerciseIds.map((id) => {
+                      const ex = getExerciseById(id)
+                      return <li key={id}>{ex?.name || id}</li>
+                    })}
+                  </ul>
+                </article>
+              ))
+            ) : (
+              <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text)' }}>
+                Nenhum treino gerado. Selecione exercícios e clique em "Gerar treino otimizado".
+              </div>
+            )}
           </div>
         </section>
       </main>
