@@ -4,7 +4,7 @@ import { exerciseDatabase, buildWorkoutGraph, getExerciseById } from './database
 
 function App() {
   const [selectedExercises, setSelectedExercises] = useState<string[]>([
-    'E1', 'E2', 'E3', 'E4' // Alguns exercícios pré-selecionados
+    'E1', 'E2', 'E3', 'E4'
   ])
   const [workoutPlan, setWorkoutPlan] = useState<Record<number, string[]> | null>(null)
 
@@ -20,10 +20,8 @@ function App() {
       return
     }
 
-    // Filtra os exercícios completos a partir dos IDs selecionados
     const selectedList = exerciseDatabase.filter(e => selectedExercises.includes(e.id))
     
-    // Constrói o grafo e gera a coloração
     const graph = buildWorkoutGraph(selectedList)
     const result = graph.colorGraph()
     
